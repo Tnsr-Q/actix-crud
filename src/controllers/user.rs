@@ -18,7 +18,7 @@ pub async fn check_user(req: HttpRequest, _pool: Data<PgPool>) -> impl Responder
         })
     } else {
         HttpResponse::Unauthorized().json(ApiResponse::<String> {
-            status: 400,
+            status: 401,
             msg: format!("Unauthorized Access!!"),
             results: None,
         })
@@ -47,7 +47,7 @@ pub async fn save_user(
         })
     } else {
         HttpResponse::Unauthorized().json(ApiResponse::<String> {
-            status: 400,
+            status: 401,
             msg: format!("Unauthorized Access!!"),
             results: None,
         })
