@@ -2,7 +2,7 @@
 .PHONY:build
 
 run:
-		cargo watch -x run
+		RUST_LOG=info cargo watch -x run
 
 build:
 			cargo build

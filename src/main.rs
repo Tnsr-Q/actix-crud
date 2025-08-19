@@ -1,4 +1,5 @@
 use actix_cors::Cors;
+use actix_web::middleware::from_fn;
 use actix_web::web::Data;
 use actix_web::{App, HttpServer};
 use dotenv::dotenv;
@@ -6,9 +7,14 @@ use env_logger;
 use log::info;
 use sqlx::postgres::PgPoolOptions;
 use std::{env, io};
+
+use self::middlewares::auth::authenticate_request;
+use self::middlewares::logger::log_requests;
 mod controllers;
+mod middlewares;
 mod repository;
 mod routes;
+mod utils;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -47,9 +53,13 @@ async fn main() -> std::io::Result<()> {
                     .supports_credentials()
                     .max_age(3600),
             )
+            .wrap(from_fn(authenticate_request))
+            .wrap(from_fn(log_requests))
             .configure(routes::init)
     })
     .bind((host.as_str(), port))?;
+
+    info!("Server is running 🚀");
 
     server.run().await
 }
