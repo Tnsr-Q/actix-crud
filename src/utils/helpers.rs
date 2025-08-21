@@ -12,7 +12,7 @@ pub fn get_conn_url() -> String {
     let db_port = env::var("DB_PORT").expect("Key not found!!");
 
     format!(
-        "postgresql://{:?}:{:?}@{:?}:{:?}/{:?}",
+        "postgresql://{}:{}@{}:{}/{}",
         db_user.trim(),
         db_pass.trim(),
         db_host.trim(),

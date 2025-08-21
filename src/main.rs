@@ -24,8 +24,6 @@ async fn main() -> std::io::Result<()> {
 
     info!("Starting the server");
     let db_url = get_conn_url();
-    //TODO::
-    println!("URL :: {:?}", db_url);
 
     let db_pool = PgPoolOptions::new()
         .connect(db_url.as_str())
