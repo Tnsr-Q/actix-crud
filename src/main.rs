@@ -10,6 +10,7 @@ use std::{env, io};
 
 use self::middlewares::auth::authenticate_request;
 use self::middlewares::logger::log_requests;
+use self::utils::helpers::get_conn_url;
 mod controllers;
 mod middlewares;
 mod repository;
@@ -22,13 +23,15 @@ async fn main() -> std::io::Result<()> {
     dotenv().ok();
 
     info!("Starting the server");
-    let db_url = env::var("DB_URL").expect("DB URL not found on the .env file");
+    let db_url = get_conn_url();
+    //TODO::
+    println!("URL :: {:?}", db_url);
 
     let db_pool = PgPoolOptions::new()
         .connect(db_url.as_str())
         .await
         .map_err(|e| {
-            // info!("Error in connecting to the Database {:?}", e);
+            info!("Error in connecting to the Database {:?}", e);
             io::Error::new(
                 io::ErrorKind::Other,
                 format!("Failed to connect to database :: {:?}", e).as_str(),
