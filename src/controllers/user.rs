@@ -8,21 +8,24 @@ use crate::utils::types::RegisterUser;
 
 use super::api_responses::ApiResponse;
 
-pub async fn register_user(payload: Json<RegisterUser>, pool: &Data<PgPool>) -> impl Responder {
+pub async fn register_user(payload: Json<RegisterUser>, pool: Data<PgPool>) -> impl Responder {
     let payload = payload.into_inner();
-    let user_res =
-        match UserRepo::user_registration(payload, pool, String::from("asdhjgadhjgasdhjgasjhdgas"))
-            .await
-        {
-            Ok(res) => res,
-            Err(e) => {
-                return HttpResponse::InternalServerError().json(ApiResponse::<String> {
-                    status: 500,
-                    msg: format!("Error occured !! {:?}", e),
-                    results: None,
-                });
-            }
-        };
+    let user_res = match UserRepo::user_registration(
+        payload,
+        &pool,
+        String::from("asdhjgadhjgasdhjgasjhdgas"),
+    )
+    .await
+    {
+        Ok(res) => res,
+        Err(e) => {
+            return HttpResponse::InternalServerError().json(ApiResponse::<String> {
+                status: 500,
+                msg: format!("Error occured !! {:?}", e),
+                results: None,
+            });
+        }
+    };
 
     let token = match generate_jwt_token(user_res) {
         Ok(token) => token,
@@ -40,4 +43,3 @@ pub async fn register_user(payload: Json<RegisterUser>, pool: &Data<PgPool>) -> 
         results: Some(token),
     })
 }
-

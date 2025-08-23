@@ -12,15 +12,17 @@ impl UserRepo {
         pool: &Data<PgPool>,
         sec_hash: String,
     ) -> Result<i32, Box<dyn Error>> {
-        sqlx::query!(
-            r#"INSERT INTO users (user_name, sec, user_login, address) VALUES (?,?,?,?)"#,
-            payload.user_name,
-            sec_hash,
-            payload.user_login,
-            payload.address,
-        )
-        .execute(pool)
-        .await?;
+        // let response = sqlx::query(
+        //     r#"INSERT INTO users (user_name, sec, user_login, address) VALUES ($1,$2,$3,$4)"#,
+        // )
+        // .bind(payload.user_name)
+        // .bind(sec_hash)
+        // .bind(payload.user_login)
+        // .bind(payload.address)
+        // .execute(pool.as_ref())
+        // .await?;
+        // //TODO::
+        // println!("res :: {:?}", response);
         Ok(1)
     }
 }
