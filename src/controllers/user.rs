@@ -1,55 +1,43 @@
-use std::sync::Arc;
-
 use actix_web::web::{Data, Json};
-use actix_web::{HttpMessage, HttpRequest, HttpResponse, Responder};
+use actix_web::{HttpResponse, Responder};
 use sqlx::PgPool;
 
-use crate::utils::types::{UserDetail, UserInfo, UserPayload};
+use crate::repository::user_repo::UserRepo;
+use crate::utils::jwt_impl::generate_jwt_token;
+use crate::utils::types::RegisterUser;
 
 use super::api_responses::ApiResponse;
 
-pub async fn check_user(req: HttpRequest, _pool: Data<PgPool>) -> impl Responder {
-    let extentions = req.extensions();
-    if let Some(user_details) = extentions.get::<Arc<UserInfo>>() {
-        HttpResponse::Ok().json(ApiResponse {
-            status: 200,
-            msg: format!("User info fetched!!"),
-            results: Some(user_details),
-        })
-    } else {
-        HttpResponse::Unauthorized().json(ApiResponse::<String> {
-            status: 401,
-            msg: format!("Unauthorized Access!!"),
-            results: None,
-        })
-    }
-}
-
-pub async fn save_user(
-    req: HttpRequest,
-    _pool: Data<PgPool>,
-    payload: Json<UserPayload>,
-) -> impl Responder {
+pub async fn register_user(payload: Json<RegisterUser>, pool: &Data<PgPool>) -> impl Responder {
     let payload = payload.into_inner();
-    let extentions = req.extensions();
-
-    if let Some(user_details) = extentions.get::<Arc<UserInfo>>() {
-        let user_item = UserDetail {
-            user_info: UserInfo {
-                user_id: user_details.user_id,
-            },
-            user_payload: payload,
+    let user_res =
+        match UserRepo::user_registration(payload, pool, String::from("asdhjgadhjgasdhjgasjhdgas"))
+            .await
+        {
+            Ok(res) => res,
+            Err(e) => {
+                return HttpResponse::InternalServerError().json(ApiResponse::<String> {
+                    status: 500,
+                    msg: format!("Error occured !! {:?}", e),
+                    results: None,
+                });
+            }
         };
-        HttpResponse::Ok().json(ApiResponse {
-            status: 200,
-            msg: format!("All is well !!"),
-            results: Some(user_item),
-        })
-    } else {
-        HttpResponse::Unauthorized().json(ApiResponse::<String> {
-            status: 401,
-            msg: format!("Unauthorized Access!!"),
-            results: None,
-        })
-    }
+
+    let token = match generate_jwt_token(user_res) {
+        Ok(token) => token,
+        Err(e) => {
+            return HttpResponse::InternalServerError().json(ApiResponse::<String> {
+                status: 500,
+                msg: format!("Error occured !! {:?}", e),
+                results: None,
+            });
+        }
+    };
+    HttpResponse::Ok().json(ApiResponse {
+        status: 200,
+        msg: String::from("User registered & token generated"),
+        results: Some(token),
+    })
 }
+

@@ -17,3 +17,20 @@ pub struct UserDetail {
     pub user_info: UserInfo,
     pub user_payload: UserPayload,
 }
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct RegisterUser {
+    pub user_name: String,
+    pub sec: String,
+    pub user_login: String,
+    pub address: String,
+}
+
+#[derive(Serialize, Debug, Deserialize)]
+pub struct Claims {
+    pub sub: i32,
+    pub exp: i64,
+    pub aud: String,
+    pub iss: String,
+    pub iat: i64,
+}
