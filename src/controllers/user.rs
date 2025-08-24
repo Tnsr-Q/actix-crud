@@ -3,20 +3,16 @@ use actix_web::{HttpResponse, Responder};
 use sqlx::PgPool;
 
 use crate::repository::user_repo::UserRepo;
-use crate::utils::jwt_impl::generate_jwt_token;
+use crate::utils::jwt_impl::{generate_jwt_token, get_hash};
 use crate::utils::types::RegisterUser;
 
 use super::api_responses::ApiResponse;
 
 pub async fn register_user(payload: Json<RegisterUser>, pool: Data<PgPool>) -> impl Responder {
     let payload = payload.into_inner();
-    let user_res = match UserRepo::user_registration(
-        payload,
-        &pool,
-        String::from("asdhjgadhjgasdhjgasjhdgas"),
-    )
-    .await
-    {
+    let sec = &payload.sec;
+    let hash = get_hash(sec).unwrap();
+    let user_res = match UserRepo::user_registration(payload, &pool, hash).await {
         Ok(res) => res,
         Err(e) => {
             return HttpResponse::InternalServerError().json(ApiResponse::<String> {
