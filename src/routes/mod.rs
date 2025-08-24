@@ -2,13 +2,17 @@ use actix_web::web::{self, get, post, resource, scope, ServiceConfig};
 
 use crate::controllers::health::{check_health, not_found};
 use crate::controllers::status::{check_user, save_user_test};
-use crate::controllers::user::register_user;
+use crate::controllers::user::{register_user, user_login};
 
 pub fn init(cfg: &mut ServiceConfig) {
     cfg.service(
         scope("api/v1")
             .service(resource("/check_status").route(get().to(check_health)))
-            .service(scope("/users").service(resource("/register").route(post().to(register_user))))
+            .service(
+                scope("/users")
+                    .service(resource("/login").route(post().to(user_login)))
+                    .service(resource("/register").route(post().to(register_user))),
+            )
             .service(resource("/check_user_status").route(get().to(check_user)))
             .service(resource("/save_user_test").route(post().to(save_user_test))),
     );

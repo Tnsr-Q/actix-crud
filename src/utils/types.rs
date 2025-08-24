@@ -34,3 +34,15 @@ pub struct Claims {
     pub iss: String,
     pub iat: i64,
 }
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct UserLogin {
+    pub user_login: String,
+    pub sec: String,
+}
+
+#[derive(sqlx::FromRow, Serialize, Deserialize, Debug)]
+pub struct UserDetails {
+    pub id: i32,
+    pub sec: String,
+}

@@ -1,7 +1,7 @@
 use std::env;
 
 use super::types::Claims;
-use bcrypt::{hash, BcryptError, DEFAULT_COST};
+use bcrypt::{hash, verify, BcryptError, DEFAULT_COST};
 use chrono::{Duration, Utc};
 use dotenv::dotenv;
 use jsonwebtoken::errors::Error;
@@ -38,4 +38,8 @@ pub fn get_hash(pass: &String) -> Result<String, BcryptError> {
         }
     };
     Ok(hash)
+}
+
+pub fn validate_hash(hash: String, sec: &String) -> Result<bool, BcryptError> {
+    verify(sec, &hash)
 }

@@ -1,8 +1,8 @@
 use actix_web::web::Data;
-use sqlx::PgPool;
+use sqlx::{PgPool, Row};
 use std::error::Error;
 
-use crate::utils::types::RegisterUser;
+use crate::utils::types::{RegisterUser, UserDetails, UserLogin};
 
 pub struct UserRepo;
 
@@ -32,5 +32,20 @@ impl UserRepo {
             return Ok(user_row);
         }
         Err("Record not inserted!!".into())
+    }
+
+    pub async fn fetch_one_user(
+        payload: &UserLogin,
+        pool: &Data<PgPool>,
+    ) -> Result<UserDetails, Box<dyn Error>> {
+        let row = sqlx::query("SELECT id, sec from app_users WHERE user_login = $1")
+            .bind(&payload.user_login)
+            .fetch_one(pool.as_ref())
+            .await?;
+        let user_details = UserDetails {
+            id: row.get("id"),
+            sec: row.get("sec"),
+        };
+        Ok(user_details)
     }
 }
