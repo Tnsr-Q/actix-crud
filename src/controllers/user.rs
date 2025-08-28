@@ -8,6 +8,24 @@ use crate::utils::types::{RegisterUser, UserLogin};
 
 use super::api_responses::ApiResponse;
 
+pub async fn fetch_all(pool: Data<PgPool>) -> impl Responder {
+    let user_list = match UserRepo::fetch_users_list(&pool).await {
+        Ok(res) => res,
+        Err(e) => {
+            return HttpResponse::InternalServerError().json(ApiResponse::<String> {
+                status: 500,
+                msg: format!("Error occured!! {:?}", e),
+                results: None,
+            });
+        }
+    };
+    HttpResponse::Ok().json(ApiResponse {
+        status: 200,
+        msg: format!("Users fetched !!"),
+        results: Some(user_list),
+    })
+}
+
 pub async fn register_user(payload: Json<RegisterUser>, pool: Data<PgPool>) -> impl Responder {
     let payload = payload.into_inner();
     let sec = &payload.sec;

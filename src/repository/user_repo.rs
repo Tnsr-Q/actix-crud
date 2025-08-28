@@ -1,12 +1,26 @@
 use actix_web::web::Data;
+use sqlx::postgres::PgRow;
 use sqlx::{PgPool, Row};
 use std::error::Error;
 
-use crate::utils::types::{RegisterUser, UserDetails, UserLogin};
+use crate::utils::types::{RegisterUser, UserDetails, UserLogin, Users};
 
 pub struct UserRepo;
 
 impl UserRepo {
+    pub async fn fetch_users_list(pool: &Data<PgPool>) -> Result<Vec<Users>, Box<dyn Error>> {
+        let rows: Vec<PgRow> = sqlx::query("SELECT user_login FROM app_users")
+            .fetch_all(pool.as_ref())
+            .await?;
+        let mut users_list = vec![];
+        for row in rows {
+            users_list.push(Users {
+                user_login: row.get("user_login"),
+            });
+        }
+        Ok(users_list)
+    }
+
     pub async fn user_registration(
         payload: RegisterUser,
         pool: &Data<PgPool>,

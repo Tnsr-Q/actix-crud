@@ -20,7 +20,7 @@ pub async fn log_requests(
             res
         }
         Err(e) => {
-            error!("::Error occured::\n");
+            error!("::Error occured:: {:?}\n", e);
             return Err(e);
         }
     };

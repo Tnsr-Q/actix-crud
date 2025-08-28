@@ -1,3 +1,4 @@
+use chrono::NaiveDateTime;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
@@ -30,7 +31,7 @@ pub struct RegisterUser {
 pub struct Claims {
     pub sub: i32,
     pub exp: i64,
-    pub aud: String,
+    // pub aud: String,
     pub iss: String,
     pub iat: i64,
 }
@@ -45,4 +46,26 @@ pub struct UserLogin {
 pub struct UserDetails {
     pub id: i32,
     pub sec: String,
+}
+
+#[derive(Serialize, Deserialize, Debug, sqlx::FromRow)]
+pub struct Users {
+    pub user_login: String,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct SingleOrder {
+    pub order_id: i32,
+}
+
+#[derive(Serialize, Deserialize, Debug, sqlx::FromRow)]
+pub struct OrderDetails {
+    pub order_id: i32,
+    pub description: String,
+    pub created_at: NaiveDateTime,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct Order {
+    pub description: String,
 }

@@ -16,7 +16,7 @@ pub fn generate_jwt_token(user_id: i32) -> Result<String, Error> {
     let claims = Claims {
         sub: user_id,
         exp,
-        aud: String::from("Vipin"),
+        // aud: String::from("Vipin"),
         iss: String::from("vipin"),
         iat: Utc::now().timestamp(),
     };
