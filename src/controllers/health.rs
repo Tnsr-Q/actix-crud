@@ -19,7 +19,7 @@ pub async fn check_health(pool: Data<PgPool>) -> impl Responder {
     };
     HttpResponse::Ok().json(ApiResponse {
         status: 200,
-        msg: String::from("OK!!"),
+        msg: String::from("Server is Healthy and Running !!"),
         results: Some(status),
     })
 }

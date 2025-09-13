@@ -42,7 +42,7 @@ async fn main() -> std::io::Result<()> {
         .parse::<u16>()
         .unwrap();
     let allowed_origin =
-        env::var("ALLOWED_ORIGIN").unwrap_or_else(|_| "127.0.0.1:3000".to_string());
+        env::var("ALLOWED_ORIGIN").unwrap_or_else(|_| "127.0.0.1:5173".to_string());
 
     let server = HttpServer::new(move || {
         App::new()
@@ -50,7 +50,8 @@ async fn main() -> std::io::Result<()> {
             .wrap(
                 Cors::default()
                     .allowed_origin(&allowed_origin.as_str())
-                    .send_wildcard()
+                    .allowed_headers(utils::contants::HEADERS)
+                    .allowed_methods(utils::contants::METHODS)
                     .supports_credentials()
                     .max_age(3600),
             )
