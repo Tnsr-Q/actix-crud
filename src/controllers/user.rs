@@ -1,3 +1,5 @@
+use actix_web::cookie::time::Duration;
+use actix_web::cookie::{Cookie, SameSite};
 use actix_web::web::{Data, Json};
 use actix_web::{HttpResponse, Responder};
 use sqlx::PgPool;
@@ -42,7 +44,7 @@ pub async fn register_user(payload: Json<RegisterUser>, pool: Data<PgPool>) -> i
     };
 
     let token = match generate_jwt_token(user_res) {
-        Ok(token) => token,
+        Ok(token) => "Bearer ".to_string() + &token,
         Err(e) => {
             return HttpResponse::InternalServerError().json(ApiResponse::<String> {
                 status: 500,
@@ -51,7 +53,15 @@ pub async fn register_user(payload: Json<RegisterUser>, pool: Data<PgPool>) -> i
             });
         }
     };
-    HttpResponse::Ok().json(ApiResponse {
+
+    let cookie = Cookie::build("OKIJ", &token)
+        .http_only(true)
+        // .same_site(SameSite::Strict)
+        .path("/")
+        .max_age(Duration::hours(2))
+        .finish();
+
+    HttpResponse::Ok().cookie(cookie).json(ApiResponse {
         status: 200,
         msg: String::from("User registered & token generated"),
         results: Some(token),
