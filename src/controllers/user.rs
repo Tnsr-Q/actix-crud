@@ -16,14 +16,14 @@ pub async fn fetch_all(pool: Data<PgPool>) -> impl Responder {
         Err(e) => {
             return HttpResponse::InternalServerError().json(ApiResponse::<String> {
                 status: 500,
-                msg: format!("Error occured!! {:?}", e),
+                msg: format!("Error occurred!! {:?}", e),
                 results: None,
             });
         }
     };
     HttpResponse::Ok().json(ApiResponse {
         status: 200,
-        msg: format!("Users fetched !!"),
+        msg: "Users fetched !!".to_string(),
         results: Some(user_list),
     })
 }
@@ -58,7 +58,7 @@ pub async fn register_user(payload: Json<RegisterUser>, pool: Data<PgPool>) -> i
         Err(e) => {
             return HttpResponse::InternalServerError().json(ApiResponse::<String> {
                 status: 500,
-                msg: format!("Error occured !! {:?}", e),
+                msg: format!("Error occurred!! {:?}", e),
                 results: None,
             });
         }
@@ -69,7 +69,7 @@ pub async fn register_user(payload: Json<RegisterUser>, pool: Data<PgPool>) -> i
         Err(e) => {
             return HttpResponse::InternalServerError().json(ApiResponse::<String> {
                 status: 500,
-                msg: format!("Error occured !! {:?}", e),
+                msg: format!("Error occurred!! {:?}", e),
                 results: None,
             });
         }
@@ -116,7 +116,7 @@ pub async fn user_login(payload: Json<UserLogin>, pool: Data<PgPool>) -> impl Re
         Err(e) => {
             return HttpResponse::InternalServerError().json(ApiResponse::<String> {
                 status: 500,
-                msg: format!("Error occured !! {:?}", e),
+                msg: format!("Error occurred!! {:?}", e),
                 results: None,
             });
         }
@@ -126,7 +126,7 @@ pub async fn user_login(payload: Json<UserLogin>, pool: Data<PgPool>) -> impl Re
         Err(e) => {
             return HttpResponse::InternalServerError().json(ApiResponse::<String> {
                 status: 500,
-                msg: format!("Error occured !! {:?}", e),
+                msg: format!("Error occurred!! {:?}", e),
                 results: None,
             });
         }
@@ -145,13 +145,13 @@ pub async fn user_login(payload: Json<UserLogin>, pool: Data<PgPool>) -> impl Re
             .cookie(cookie)
             .json(ApiResponse::<String> {
                 status: 200,
-                msg: format!("User Loggedin !!"),
+                msg: "User Loggedin !!".to_string(),
                 results: None,
             })
     } else {
         HttpResponse::Unauthorized().json(ApiResponse::<String> {
             status: 401,
-            msg: format!("Uauthorized Access !!!"),
+            msg: "Unauthorized Access !!!".to_string(),
             results: None,
         })
     }
