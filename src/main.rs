@@ -3,7 +3,7 @@ use actix_web::middleware::from_fn;
 use actix_web::web::Data;
 use actix_web::{App, HttpServer};
 use dotenv::dotenv;
-use env_logger;
+
 use log::info;
 use sqlx::postgres::PgPoolOptions;
 use std::{env, io};
@@ -30,8 +30,7 @@ async fn main() -> std::io::Result<()> {
         .await
         .map_err(|e| {
             info!("Error in connecting to the Database {:?}", e);
-            io::Error::new(
-                io::ErrorKind::Other,
+            io::Error::other(
                 format!("Failed to connect to database :: {:?}", e).as_str(),
             )
         })?;
@@ -49,9 +48,9 @@ async fn main() -> std::io::Result<()> {
             .app_data(Data::new(db_pool.clone()))
             .wrap(
                 Cors::default()
-                    .allowed_origin(&allowed_origin.as_str())
-                    .allowed_headers(utils::contants::HEADERS)
-                    .allowed_methods(utils::contants::METHODS)
+                    .allowed_origin(allowed_origin.as_str())
+                    .allowed_headers(utils::constants::HEADERS)
+                    .allowed_methods(utils::constants::METHODS)
                     .supports_credentials()
                     .max_age(3600),
             )
