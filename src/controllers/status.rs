@@ -13,13 +13,13 @@ pub async fn check_user(req: HttpRequest, _pool: Data<PgPool>) -> impl Responder
     if let Some(user_details) = extentions.get::<Arc<UserInfo>>() {
         HttpResponse::Ok().json(ApiResponse {
             status: 200,
-            msg: format!("User info fetched!!"),
+            msg: "User info fetched!!".to_string(),
             results: Some(user_details),
         })
     } else {
         HttpResponse::Unauthorized().json(ApiResponse::<String> {
             status: 401,
-            msg: format!("Unauthorized Access!!"),
+            msg: "Unauthorized Access!!".to_string(),
             results: None,
         })
     }
@@ -42,13 +42,13 @@ pub async fn save_user_test(
         };
         HttpResponse::Ok().json(ApiResponse {
             status: 200,
-            msg: format!("All is well !!"),
+            msg: "All is well !!".to_string(),
             results: Some(user_item),
         })
     } else {
         HttpResponse::Unauthorized().json(ApiResponse::<String> {
             status: 401,
-            msg: format!("Unauthorized Access!!"),
+            msg: "Unauthorized Access!!".to_string(),
             results: None,
         })
     }

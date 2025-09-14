@@ -1,5 +1,5 @@
 use actix_web::cookie::time::Duration;
-use actix_web::cookie::{Cookie, SameSite};
+use actix_web::cookie::Cookie;
 use actix_web::web::{Data, Json};
 use actix_web::{HttpResponse, Responder};
 use sqlx::PgPool;
@@ -23,7 +23,7 @@ pub async fn fetch_all(pool: Data<PgPool>) -> impl Responder {
     };
     HttpResponse::Ok().json(ApiResponse {
         status: 200,
-        msg: format!("Users fetched !!"),
+        msg: "Users fetched !!".to_string(),
         results: Some(user_list),
     })
 }
@@ -94,13 +94,13 @@ pub async fn user_login(payload: Json<UserLogin>, pool: Data<PgPool>) -> impl Re
         let token = generate_jwt_token(user_details.id).unwrap();
         HttpResponse::Ok().json(ApiResponse {
             status: 200,
-            msg: format!("User Loggedin !!"),
+            msg: "User Loggedin !!".to_string(),
             results: Some(token),
         })
     } else {
         HttpResponse::Unauthorized().json(ApiResponse::<String> {
             status: 401,
-            msg: format!("Uauthorized Access !!!"),
+            msg: "Unauthorized Access !!!".to_string(),
             results: None,
         })
     }

@@ -9,7 +9,7 @@ use super::api_responses::ApiResponse;
 
 pub async fn get_one_order(query: Query<SingleOrder>, pool: Data<PgPool>) -> impl Responder {
     let order_id = &query.order_id;
-    let res = match OrderRepo::get_one_order_detail(&order_id, &pool).await {
+    let res = match OrderRepo::get_one_order_detail(order_id, &pool).await {
         Ok(res) => res,
         Err(e) => {
             return HttpResponse::InternalServerError().json(ApiResponse::<String> {
