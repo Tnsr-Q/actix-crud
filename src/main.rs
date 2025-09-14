@@ -50,8 +50,8 @@ async fn main() -> std::io::Result<()> {
             .wrap(
                 Cors::default()
                     .allowed_origin(&allowed_origin.as_str())
-                    .allowed_headers(utils::contants::HEADERS)
-                    .allowed_methods(utils::contants::METHODS)
+                    .allowed_headers(utils::constants::HEADERS)
+                    .allowed_methods(utils::constants::METHODS)
                     .supports_credentials()
                     .max_age(3600),
             )
