@@ -1,10 +1,9 @@
-use actix_web::cookie::time::Duration;
-use actix_web::cookie::Cookie;
 use actix_web::web::{Data, Json};
 use actix_web::{HttpResponse, Responder};
 use sqlx::PgPool;
 
 use crate::repository::user_repo::UserRepo;
+use crate::utils::helpers::build_auth_cookie;
 use crate::utils::jwt_impl::{generate_jwt_token, get_hash, validate_hash};
 use crate::utils::types::{RegisterUser, UserLogin};
 
@@ -54,12 +53,7 @@ pub async fn register_user(payload: Json<RegisterUser>, pool: Data<PgPool>) -> i
         }
     };
 
-    let cookie = Cookie::build("OKIJ", &token)
-        .http_only(true)
-        // .same_site(SameSite::Strict)
-        .path("/")
-        .max_age(Duration::hours(2))
-        .finish();
+    let cookie = build_auth_cookie(token.clone());
 
     HttpResponse::Ok().cookie(cookie).json(ApiResponse {
         status: 200,
@@ -91,8 +85,20 @@ pub async fn user_login(payload: Json<UserLogin>, pool: Data<PgPool>) -> impl Re
         }
     };
     if is_valid {
-        let token = generate_jwt_token(user_details.id).unwrap();
-        HttpResponse::Ok().json(ApiResponse {
+        let token = match generate_jwt_token(user_details.id) {
+            Ok(token) => "Bearer ".to_string() + &token,
+            Err(e) => {
+                return HttpResponse::InternalServerError().json(ApiResponse::<String> {
+                    status: 500,
+                    msg: format!("Error occured !! {:?}", e),
+                    results: None,
+                });
+            }
+        };
+        
+        let cookie = build_auth_cookie(token.clone());
+        
+        HttpResponse::Ok().cookie(cookie).json(ApiResponse {
             status: 200,
             msg: "User Loggedin !!".to_string(),
             results: Some(token),

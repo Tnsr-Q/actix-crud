@@ -10,3 +10,5 @@ pub const METHODS: &[Method] = &[
 
 pub const HEADERS: &[header::HeaderName] =
     &[header::AUTHORIZATION, header::ACCEPT, header::CONTENT_TYPE];
+
+pub const COOKIE_NAME: &str = "OKIJ";

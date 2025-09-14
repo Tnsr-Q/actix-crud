@@ -1,6 +1,10 @@
 use std::env;
 
+use actix_web::cookie::time::Duration;
+use actix_web::cookie::Cookie;
 use dotenv::dotenv;
+
+use super::constants::COOKIE_NAME;
 
 pub fn get_conn_url() -> String {
     dotenv().ok();
@@ -19,4 +23,13 @@ pub fn get_conn_url() -> String {
         db_port.trim(),
         db_name.trim()
     )
+}
+
+pub fn build_auth_cookie(token: String) -> Cookie<'static> {
+    Cookie::build(COOKIE_NAME, token)
+        .http_only(true)
+        // .same_site(SameSite::Strict)  // Commented out as in original register_user
+        .path("/")
+        .max_age(Duration::hours(2))
+        .finish()
 }
