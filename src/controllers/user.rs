@@ -56,16 +56,19 @@ pub async fn register_user(payload: Json<RegisterUser>, pool: Data<PgPool>) -> i
 
     let cookie = Cookie::build("OKIJ", &token)
         .http_only(true)
-        // .same_site(SameSite::Strict)
+        .same_site(SameSite::None)
+        .secure(true)
         .path("/")
         .max_age(Duration::hours(2))
         .finish();
 
-    HttpResponse::Ok().cookie(cookie).json(ApiResponse {
-        status: 200,
-        msg: String::from("User registered & token generated"),
-        results: Some(token),
-    })
+    HttpResponse::Ok()
+        .cookie(cookie)
+        .json(ApiResponse::<String> {
+            status: 200,
+            msg: String::from("User registered & token generated"),
+            results: None,
+        })
 }
 
 pub async fn user_login(payload: Json<UserLogin>, pool: Data<PgPool>) -> impl Responder {
@@ -92,11 +95,21 @@ pub async fn user_login(payload: Json<UserLogin>, pool: Data<PgPool>) -> impl Re
     };
     if is_valid {
         let token = generate_jwt_token(user_details.id).unwrap();
-        HttpResponse::Ok().json(ApiResponse {
-            status: 200,
-            msg: format!("User Loggedin !!"),
-            results: Some(token),
-        })
+        let cookie = Cookie::build("OKIJ", &token)
+            .http_only(true)
+            .same_site(SameSite::None)
+            .secure(true)
+            .path("/")
+            .max_age(Duration::hours(2))
+            .finish();
+
+        HttpResponse::Ok()
+            .cookie(cookie)
+            .json(ApiResponse::<String> {
+                status: 200,
+                msg: format!("User Loggedin !!"),
+                results: None,
+            })
     } else {
         HttpResponse::Unauthorized().json(ApiResponse::<String> {
             status: 401,
