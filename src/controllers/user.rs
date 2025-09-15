@@ -1,10 +1,11 @@
 use actix_web::cookie::time::Duration;
-use actix_web::cookie::{Cookie, SameSite};
+use actix_web::cookie::{Cookie, SameSite}; main
 use actix_web::web::{Data, Json};
 use actix_web::{HttpResponse, Responder};
 use sqlx::PgPool;
 
 use crate::repository::user_repo::UserRepo;
+use crate::utils::helpers::build_auth_cookie;
 use crate::utils::jwt_impl::{generate_jwt_token, get_hash, validate_hash};
 use crate::utils::types::{RegisterUser, UserLogin};
 
@@ -75,13 +76,16 @@ pub async fn register_user(payload: Json<RegisterUser>, pool: Data<PgPool>) -> i
         }
     };
 
+
+    let cookie = build_auth_cookie(token.clone());
+
     let cookie = Cookie::build("OKIJ", &token)
         .http_only(true)
         .same_site(SameSite::None)
         .secure(true)
         .path("/")
         .max_age(Duration::hours(2))
-        .finish();
+        .finish(); main
 
     HttpResponse::Ok()
         .cookie(cookie)
@@ -132,6 +136,26 @@ pub async fn user_login(payload: Json<UserLogin>, pool: Data<PgPool>) -> impl Re
         }
     };
     if is_valid {
+      
+        let token = match generate_jwt_token(user_details.id) {
+            Ok(token) => "Bearer ".to_string() + &token,
+            Err(e) => {
+                return HttpResponse::InternalServerError().json(ApiResponse::<String> {
+                    status: 500,
+                    msg: format!("Error occured !! {:?}", e),
+                    results: None,
+                });
+            }
+        };
+        
+        let cookie = build_auth_cookie(token.clone());
+        
+        HttpResponse::Ok().cookie(cookie).json(ApiResponse {
+            status: 200,
+            msg: "User Loggedin !!".to_string(),
+            results: Some(token),
+        })
+
         let token = generate_jwt_token(user_details.id).unwrap();
         let cookie = Cookie::build("OKIJ", &token)
             .http_only(true)
@@ -147,7 +171,7 @@ pub async fn user_login(payload: Json<UserLogin>, pool: Data<PgPool>) -> impl Re
                 status: 200,
                 msg: "User Loggedin !!".to_string(),
                 results: None,
-            })
+            })  main
     } else {
         HttpResponse::Unauthorized().json(ApiResponse::<String> {
             status: 401,
